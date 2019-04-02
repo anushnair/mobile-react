@@ -31,6 +31,8 @@ import com.jumio.nv.data.document.NVDocumentType;
 import com.jumio.nv.data.document.NVMRZFormat;
 import com.jumio.nv.enums.NVExtractionMethod;
 import com.jumio.nv.enums.NVGender;
+import com.reactnativenavigation.NavigationActivity;
+
 
 import java.util.ArrayList;
 
