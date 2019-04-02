@@ -34,7 +34,7 @@ import com.jumio.nv.enums.NVGender;
 
 import java.util.ArrayList;
 
-public class JumioActivity extends ReactActivity {
+public class JumioActivity extends NavigationActivity {
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
