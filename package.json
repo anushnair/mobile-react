@@ -25,6 +25,6 @@
   "license": "ISC",
   "dependencies": {
     "react-native": "^0.55.2",
-    "react-native-navigation": "https://git.termn.us/react/react-native-navigation.git#feature/jumio"
+    "react-native-navigation": "https://github.com/mjinkens1/react-native-navigation"
   }
 }
