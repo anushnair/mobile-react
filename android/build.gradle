@@ -5,7 +5,7 @@ android {
     buildToolsVersion '27.0.3'
 
     defaultConfig{
-        missingDimensionStrategy "RNN.reactNativeVersion", "reactNative57"
+        missingDimensionStrategy "RNN.reactNativeVersion", "reactNative57_5"
     }
 }
 
