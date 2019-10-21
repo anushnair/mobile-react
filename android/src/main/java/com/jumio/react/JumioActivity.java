@@ -60,7 +60,6 @@ public class JumioActivity extends ReactActivity {
 				super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 			}
 		} else {
-			Toast.makeText(this, "Not all required permissions have been granted", Toast.LENGTH_LONG).show();
 			super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 		}
 	}
