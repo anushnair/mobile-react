@@ -59,7 +59,6 @@ public class JumioActivity extends NavigationActivity {
 				super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 			}
 		} else {
-			Toast.makeText(this, "You need to grant all required permissions to start the Jumio SDK", Toast.LENGTH_LONG).show();
 			super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 		}
 	}
