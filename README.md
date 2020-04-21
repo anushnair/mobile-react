@@ -4,7 +4,7 @@ Official Jumio Mobile SDK plugin for React Native
 
 ## Compatibility
 
-We only ensure compatibility with a minimum React Native version of 0.59.4
+We only ensure compatibility with a minimum React Native version of 0.61.4
 
 ## Setup
 
@@ -12,7 +12,7 @@ Create React Native project and add the Jumio Mobile SDK module to it.
 ```
 react-native init MyProject
 cd MyProject
-npm install --save https://github.com/Jumio/mobile-react.git#v3.1.0
+npm install --save https://github.com/Jumio/mobile-react.git#v3.5.0
 react-native link react-native-jumio-mobilesdk
 ```
 
@@ -20,9 +20,9 @@ react-native link react-native-jumio-mobilesdk
 
 ### iOS
 
-1. Add the Jumio Mobile SDK to your React Native iOS project by either doing manual integration or using dependency management via cocoapods , please see [the official documentation of the Jumio Mobile SDK for iOS](https://github.com/Jumio/mobile-sdk-ios/tree/v3.1.0#basic-setup)
+1. Add the Jumio Mobile SDK to your React Native iOS project by either doing manual integration or using dependency management via cocoapods , please see [the official documentation of the Jumio Mobile SDK for iOS](https://github.com/Jumio/mobile-sdk-ios/tree/v3.4.2#basic-setup)
 2. Open the Xcode workspace (/YourApp/ios/YourApp.xcworkspace) and add the module files according to your desired product (see /YourApp/node_modules/react-native-jumio-mobilesdk/ios/) into the app project.
-  * Example: For Fastfill/Netverify add `JumioMobileSDKNetverify.h` and `JumioMobileSDKNetverify.m` to the project
+* Example: For Fastfill/Netverify add `JumioMobileSDKNetverify.h` and `JumioMobileSDKNetverify.m` to the project
 3. Add the "**NSCameraUsageDescription**"-key to your Info.plist file.
 
 ### Android
@@ -30,18 +30,18 @@ react-native link react-native-jumio-mobilesdk
 1. Open your AndroidManifest.xml file and change allowBackup to false.
 ```
 <application
-    ...
-    android:allowBackup="false"
-    ...
+...
+android:allowBackup="false"
+...
 </application>
 ```
 
 2. Make sure your compileSdkVersion and buildToolsVersion are high enough.
 ```
 android {
-    compileSdkVersion 28
-    buildToolsVersion "28.0.3"
-    ...
+  compileSdkVersion 29
+  buildToolsVersion "29.0.0"
+  ...
 }
 ```
 
@@ -50,38 +50,28 @@ Follow the Android developers guide: https://developer.android.com/studio/build/
 
 ```
 android {
+  ...
+  defaultConfig {
     ...
-    defaultConfig {
-        ...
-        multiDexEnabled true
-    }
+    multiDexEnabled true
+  }
 }
 ```
 
 4. Add the Jumio Mobile SDK repository
 ```
 repositories {  
-    maven { url 'http://mobile-sdk.jumio.com' }
+  maven { url 'http://mobile-sdk.jumio.com' }
 }
 ```
-
-5. Change the extend of your MainActivity to JumioActivity
-```
-import com.jumio.react.JumioActivity;
-
-public class MainActivity extends JumioActivity {
-```
-
-6. Add Proguard rules:
-[Proguard](https://developer.android.com/studio/build/shrink-code) is a tool for shrinking and obfuscating code your release application for the app store. You need to add this rules for building an Android release app in your `proguard-rules.pro` file as documented in the [Jumio Android proguard chapter](https://github.com/Jumio/mobile-sdk-android#proguard)
 
 ## Usage
 
 1. Add "**NativeModules**" to the import of 'react-native'.
 ```
 import {
-    ...
-    NativeModules
+  ...
+  NativeModules
 } from 'react-native';
 ```
 
@@ -93,7 +83,7 @@ const { JumioMobileSDKBamCheckout } = NativeModules;
 const { JumioMobileSDKDocumentVerification } = NativeModules;
 ```
 
-3. Initialize the SDK with the following call.
+3. The SDKs can be initialized with the following calls.
 ```
 JumioMobileSDKNetverify.initNetverify(<API_TOKEN>, <API_SECRET>, <DATACENTER>, {configuration});
 JumioMobileSDKAuthentication.initAuthentication(<API_TOKEN>, <API_SECRET>, <DATACENTER>, {configuration});
@@ -132,17 +122,21 @@ Configure the SDK with the *configuration*-Object.
 | cameraPosition | String | Which camera is used by default. Can be **FRONT** or **BACK**. |
 | preselectedDocumentVariant | String | Which types of document variants are available. Can be **PAPER** or **PLASTIC** |
 | documentTypes | String-Array | An array of accepted document types: Available document types: **PASSPORT**, **DRIVER_LICENSE**, **IDENTITY_CARD**, **VISA** |
-
+| enableWatchlistScreening | String | Enables [Jumio Screening](https://www.jumio.com/screening/). Can be **ENABLED**, **DISABLED** or **DEFAULT** (when not specified reverts to **DEFAULT**) |
+| watchlistSearchProfile | String | Specifies specific profile of watchlist |
 
 Initialization example with configuration.
 
 ```javascript
 JumioMobileSDKNetverify.initNetverify("API_TOKEN", "API_SECRET", "US", {
-    enableVerification: false,
-    userReference: "CUSTOMERID",
-    preselectedCountry: "USA",
-    cameraPosition: "BACK",
-    documentTypes: ["DRIVER_LICENSE", "PASSPORT", "IDENTITY_CARD", "VISA"]
+enableVerification: true,
+enableIdentityVerification: true,
+userReference: "CUSTOMERID",
+preselectedCountry: "USA",
+cameraPosition: "BACK",
+documentTypes: ["DRIVER_LICENSE", "PASSPORT", "IDENTITY_CARD", "VISA"],
+enableWatchlistScreening: "ENABLED",
+watchlistSearchProfile: "YOURPROFILENAME"
 });
 ```
 
@@ -173,46 +167,45 @@ netverifySDK.setEnableEMRTD(true);
 
 
 As soon as the sdk is initialized, the sdk is started by the following call.
-
 ```javascript
-JumioMobileSDKNetverify.startNetverify(successCallback, errorCallback);
-```
-
-Example
-
-```javascript
-JumioMobileSDKNetverify.startNetverify(function(documentData) {
-    // YOUR CODE
-}, function(error) {
-    // YOUR CODE
-});
+  JumioMobileSDKNetverify.startNetverify();
+};
 ```
 
 ### Authentication
 
 To initialize and start the SDK, perform the following call.
 ```javascript
-  JumioMobileSDKAuthentication.initAuthentication(<API_TOKEN>, <API_SECRET>, <DATACENTER>, {configuration});
+JumioMobileSDKAuthentication.initAuthentication(<API_TOKEN>, <API_SECRET>, <DATACENTER>, {configuration});
 ```
 
 Datacenter can either be **US** or **EU**.
 
 Configure the SDK with the *configuration*-Object. **(configuration marked with * are mandatory)**
 
+In order to connect the Authentication transaction to a specific Netverify user identity the parameter `enrollmentTransactionReference` must be set. In case an Authentication transaction has been created via the facemap server to server API `authenticationTransactionReference` should be used. Therefore `enrollmentTransactionReference` should not be set.
+
 | Configuration | Datatype | Description |
 | ------ | -------- | ----------- |
 | **enrollmentTransactionReference*** | String | The reference of the enrollment scan to authenticate for |
+| **authenticationTransactionReference*** | String | The reference of the authentication scan to authenticate for |
 | **userReference*** | String | Set a customer identifier (max. 100 characters) |
 
 Initialization example with configuration:
 ```javascript
 const startAuthentication = () => {
   JumioMobileSDKAuthentication.initAuthentication('API_TOKEN', 'API_SECRET', 'US', {
-	  enrollmentTransactionReference: "EnrollmentTransactionReference",
-	  userReference: "UserReference"
-    callbackUrl: "URL"
-  });  
+  enrollmentTransactionReference: "EnrollmentTransactionReference",
+  //authenticationTransactionReference: "AuthenticationTransactionReference",
+  userReference: "UserReference"
+  callbackUrl: "URL"
+});  
 };
+```
+
+As soon as the sdk is initialized, the sdk is started by the following call.
+```javascript
+JumioMobileSDKNetverify.startAuthentication();
 ```
 
 ### Document Verification
@@ -272,28 +265,18 @@ Initialization example with configuration.
 
 ```javascript
 JumioMobileSDKDocumentVerification.initDocumentVerification("API_TOKEN", "API_SECRET", "US", {
-    type: "BC",
-    userReference: "CUSTOMER ID",
-    country: "USA",
-    customerInternalReference: "YOURSCANREFERENCE",
-    cameraPosition: "BACK"
+  type: "BC",
+  userReference: "CUSTOMER ID",
+  country: "USA",
+  customerInternalReference: "YOURSCANREFERENCE",
+  cameraPosition: "BACK"
 });
 ```
 
-As soon as the SDK is initialized, the SDK is started by the following call.
+As soon as the sdk is initialized, the sdk is started by the following call.
 
 ```javascript
-JumioMobileSDKDocumentVerification.startDocumentVerification(successCallback, errorCallback);
-```
-
-Example
-
-```javascript
-JumioMobileSDKDocumentVerification.startDocumentVerification(function(documentData) {
-    // YOUR CODE
-}, function(error) {
-    // YOUR CODE
-});
+JumioMobileSDKDocumentVerification.startDocumentVerification();
 ```
 
 ### BAM Checkout
@@ -327,10 +310,10 @@ Initialization example with configuration.
 
 ```javascript
 JumioMobileSDKBamCheckout.initBAM("API_TOKEN", "API_SECRET", "US", {
-    cardHolderNameRequired: false,
-    cvvRequired: true,
-    cameraPosition: "BACK",
-    cardTypes: ["VISA", "MASTER_CARD"]
+  cardHolderNameRequired: false,
+  cvvRequired: true,
+  cameraPosition: "BACK",
+  cardTypes: ["VISA", "MASTER_CARD"]
 });
 ```
 
@@ -338,17 +321,7 @@ JumioMobileSDKBamCheckout.initBAM("API_TOKEN", "API_SECRET", "US", {
 As soon as the sdk is initialized, the sdk is started by the following call.
 
 ```javascript
-JumioMobileSDKBamCheckout.startBAM(successCallback, errorCallback);
-```
-
-Example
-
-```javascript
-JumioMobileSDKBamCheckout.startBAM(function(cardInformation) {
-    // YOUR CODE
-}, function(error) {
-    // YOUR CODE
-});
+JumioMobileSDKBamCheckout.startBAM();
 ```
 
 ### Offline scanning
@@ -374,72 +347,72 @@ Use `enableEMRTD` to read the NFC chip of an eMRTD.
 JumioMobileSDKNetverify.enableEMRTD();
 ```
 
-**If BAM Credit Card + ID is used, init BAM and Netverify**
+### Retrieving information
 
-4. Afterwards start the SDK with the following command.
-```javascript
-JumioMobileSDKNetverify.startNetverify();
-JumioMobileSDKDocumentVerification.startDocumentVerification();
-JumioMobileSDKBamCheckout.startBAM();
-```
-
-5. Now you can listen to events to retrieve the scanned data:
+You can listen to events to retrieve the scanned data:
 * **EventDocumentData** for Netverify results.
-* **EventAuthentication** for Authentication results
-* **EventCardInformation** for BAM results.
-* **EventDocumentVerification** for Document Verification results.
-* **EventError** for every error.
+* **EventErrorNetverify** for Netverify error.
 
-6. First add **NativeEventEmitter** to the import from 'react-native' and listen to the events.
+* **EventAuthentication** for Authentication results
+* **EventErrorAuthentication** for Authentication error.
+
+* **EventDocumentVerification** for Document Verification results.
+* **EventErrorDocumentVerification** for Document Verification error.
+
+* **EventCardInformation** for BAM results.
+* **EventErrorBam** for BAM error.
+
+First add **NativeEventEmitter** to the import from 'react-native' and listen to the events.
 
 ```
 import {
-    ...
-    NativeEventEmitter
+...
+NativeEventEmitter
 } from 'react-native';
 ```
 
 The event receives a json object with all the data.
+The example below shows how to retrieve the information of each emitter as a String:
 
-```
+```javascript
 const emitterNetverify = new NativeEventEmitter(JumioMobileSDKNetverify);
 emitterNetverify.addListener(
-    'EventDocumentData',
-	(EventDocumentData) => console.warn("EventDocumentData: " + JSON.stringify(EventDocumentData))
+  'EventDocumentData',
+  (EventDocumentData) => console.warn("EventDocumentData: " + JSON.stringify(EventDocumentData))
 );
 emitterNetverify.addListener(
-    'EventError',
-    (EventError) => console.warn("EventError: " + JSON.stringify(EventError))
+  'EventErrorNetverify',
+  (EventErrorNetverify) => console.warn("EventErrorNetverify: " + JSON.stringify(EventErrorNetverify))
 );
 
 const emitterAuthentication = new NativeEventEmitter(JumioMobileSDKAuthentication);
-emitterAuthentication.addListener(
-    'EventAuthentication',
-	(EventAuthentication) => console.warn("EventAuthentication: " + JSON.stringify(EventAuthentication))
+  emitterAuthentication.addListener(
+  'EventAuthentication',
+  (EventAuthentication) => console.warn("EventAuthentication: " + JSON.stringify(EventAuthentication))
 );
 emitterAuthentication.addListener(
-    'EventError',
-    (EventError) => console.warn("EventError: " + JSON.stringify(EventError))
+  'EventErrorAuthentication',
+  (EventErrorAuthentication) => console.warn("EventErrorAuthentication: " + JSON.stringify(EventErrorAuthentication))
 );
 
 const emitterDocumentVerification = new NativeEventEmitter(JumioMobileSDKDocumentVerification)
 emitterDocumentVerification.addListener(
-    'EventDocumentVerification',
-    (EventDocumentVerification) => console.warn("EventDocumentVerification: " + JSON.stringify(EventDocumentVerification))
+  'EventDocumentVerification',
+  (EventDocumentVerification) => console.warn("EventDocumentVerification: " + JSON.stringify(EventDocumentVerification))
 );
 emitterDocumentVerification.addListener(
-    'EventError',
-    (EventError) => console.warn("EventError: " + JSON.stringify(EventError))
+  'EventDocumentVerification',
+  (EventDocumentVerification) => console.warn("EventDocumentVerification: " + JSON.stringify(EventDocumentVerification))
 );
 
 const emitterBamCheckout = new NativeEventEmitter(JumioMobileSDKBamCheckout)
 emitterBamCheckout.addListener(
-    'EventCardInformation',
-    (EventCardInformation) => console.warn("EventCardInformation: " + JSON.stringify(EventCardInformation))
+  'EventCardInformation',
+  (EventCardInformation) => console.warn("EventCardInformation: " + JSON.stringify(EventCardInformation))
 );
 emitterBamCheckout.addListener(
-    'EventError',
-    (EventError) => console.warn("EventError: " + JSON.stringify(EventError))
+  'EventErrorBam',
+  (EventErrorBam) => console.warn("EventErrorBam: " + JSON.stringify(EventErrorBam))
 );
 ```
 
@@ -448,16 +421,16 @@ emitterBamCheckout.addListener(
 ### Android
 
 #### Netverify
-The Netverify SDK can be customized to the respective needs by following this [customization chapter](https://github.com/Jumio/mobile-sdk-android/blob/v3.1.0/docs/integration_netverify-fastfill.md#customization).
+The Netverify SDK can be customized to the respective needs by following this [customization chapter](https://github.com/Jumio/mobile-sdk-android/blob/v3.5.0/docs/integration_netverify-fastfill.md#customization).
 
 #### Authentication
-The Authentication SDK can be customized to the respective needs by following this [customization chapter](https://github.com/Jumio/mobile-sdk-android/blob/v3.1.0/docs/integration_authentication.md#customization).
+The Authentication SDK can be customized to the respective needs by following this [customization chapter](https://github.com/Jumio/mobile-sdk-android/blob/v3.5.0/docs/integration_authentication.md#customization).
 
 #### BAM Checkout
-The BAM Checkout SDK can be customized to the respective needs by following this [customization chapter](https://github.com/Jumio/mobile-sdk-android/blob/v3.1.0/docs/integration_bam-checkout.md#customization).
+The BAM Checkout SDK can be customized to the respective needs by following this [customization chapter](https://github.com/Jumio/mobile-sdk-android/blob/v3.5.0/docs/integration_bam-checkout.md#customization).
 
 #### Document Verification
-The Document Verification SDK can be customized to the respective needs by following this [customization chapter](https://github.com/Jumio/mobile-sdk-android/blob/v3.1.0/docs/integration_document-verification.md#customization).
+The Document Verification SDK can be customized to the respective needs by following this [customization chapter](https://github.com/Jumio/mobile-sdk-android/blob/v3.5.0/docs/integration_document-verification.md#customization).
 
 
 ### iOS
@@ -467,6 +440,7 @@ The SDK can be customized to the respective needs by using the following initial
 JumioMobileSDKNetverify.initNetverifyWithCustomization(<API_TOKEN>, <API_SECRET>, <DATACENTER>, {configuration}, {customization});
 JumioMobileSDKDocumentVerification.initDocumentVerificationWithCustomization(<API_TOKEN>, <API_SECRET>, <DATACENTER>, {configuration}, {customization});
 JumioMobileSDKBamCheckout.initBAMWithCustomization(<API_TOKEN>, <API_SECRET>, <DATACENTER>, {configuration}, {customization});
+JumioMobileSDKAuthentication.initAuthenticationWithCustomization(<API_TOKEN>, <API_SECRET>, <DATACENTER>, {configuration}, {customization});
 ```
 
 You can pass the following customization options to the initializer:
@@ -503,14 +477,15 @@ You can pass the following customization options to the initializer:
 All colors are provided with a HEX string with the following format: #ff00ff.
 
 **Customization example**
-```javascript
-Jumio.initNetverify("API_TOKEN", "API_SECRET", "US", {
-    enableVerification: false,
-    ...
+
+```
+Jumio.initNetverifyWithCustomization("API_TOKEN", "API_SECRET", "US", {
+  enableVerification: false,
+  ...
 }, {
-    disableBlur: true,
-    backgroundColor: "#ff00ff",
-    barTintColor: "#ff1298"
+  disableBlur: true,
+  backgroundColor: "#ff00ff",
+  barTintColor: "#ff1298"
 );
 ```
 
@@ -525,7 +500,7 @@ The JSONObject with all the extracted data that is returned for the specific pro
 *NetverifyDocumentData:*
 
 | Parameter | Type | Max. length | Description  |
-|:-------------------|:----------- 	|:-------------|:-----------------|
+|:-------------------|:-----------     |:-------------|:-----------------|
 | selectedCountry | String| 3| [ISO 3166-1 alpha-3](http://en.wikipedia.org/wiki/ISO_3166-1_alpha-3) country code as provided or selected |
 | selectedDocumentType | String | 16| PASSPORT, DRIVER_LICENSE, IDENTITY_CARD or VISA |
 | idNumber | String | 100 | Identification number of the document |
@@ -535,13 +510,12 @@ The JSONObject with all the extracted data that is returned for the specific pro
 | issuingCountry | String | 3 | Country of issue as ([ISO 3166-1 alpha-3](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3)) country code |
 | lastName | String | 100 | Last name of the customer|
 | firstName | String | 100 | First name of the customer|
-| middleName | String | 100 | Middle name of the customer |
 | dob | Date | | Date of birth |
 | gender | String | 1| m, f or x |
 | originatingCountry | String | 3|Country of origin as ([ISO 3166-1 alpha-3](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3)) country code |
-| addressLine | String | 64 | Street name	|
+| addressLine | String | 64 | Street name    |
 | city | String | 64 | City |
-| subdivision | String | 3 | Last three characters of [ISO 3166-2:US](http://en.wikipedia.org/wiki/ISO_3166-2:US) state code	|
+| subdivision | String | 3 | Last three characters of [ISO 3166-2:US](http://en.wikipedia.org/wiki/ISO_3166-2:US) state code    |
 | postCode | String | 15 | Postal code |
 | mrzData |  MRZ-DATA | | MRZ data, see table below |
 | optionalData1 | String | 50 | Optional field of MRZ line 1 |
@@ -559,7 +533,7 @@ The JSONObject with all the extracted data that is returned for the specific pro
 | line3 | String | 50| MRZ line 3 |
 | idNumberValid | BOOL| | True if ID number check digit is valid, otherwise false |
 | dobValid | BOOL | | True if date of birth check digit is valid, otherwise false |
-| expiryDateValid |	BOOL| |	True if date of expiry check digit is valid or not available, otherwise false|
+| expiryDateValid |    BOOL| |    True if date of expiry check digit is valid or not available, otherwise false|
 | personalNumberValid | BOOL | | True if personal number check digit is valid or not available, otherwise false |
 | compositeValid | BOOL | | True if composite check digit is valid, otherwise false |
 
@@ -577,7 +551,7 @@ The JSONObject with all the extracted data that is returned for the specific pro
 *BAMCardInformation:*
 
 |Parameter | Type | Max. length | Description |
-|:---------------------------- 	|:-------------|:-----------------|:-------------|
+|:----------------------------     |:-------------|:-----------------|:-------------|
 | cardType | String |  16| VISA, MASTER_CARD, AMERICAN_EXPRESS, CHINA_UNIONPAY, DINERS_CLUB, DISCOVER, JCB or STARBUCKS |
 | cardNumber | String | 16 | Full credit card number |
 | cardNumberGrouped | String | 19 | Grouped credit card number |

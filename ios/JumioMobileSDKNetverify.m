@@ -20,9 +20,8 @@
 
 RCT_EXPORT_MODULE();
 
-- (NSArray<NSString *> *)supportedEvents
-{
-    return @[@"EventError", @"EventDocumentData"];
+- (NSArray<NSString *> *)supportedEvents {
+    return @[@"EventErrorNetverify", @"EventDocumentData"];
 }
 
 RCT_EXPORT_METHOD(initNetverify:(NSString *)apiToken apiSecret:(NSString *)apiSecret dataCenter:(NSString *)dataCenter configuration:(NSDictionary *)options) {
@@ -49,8 +48,17 @@ RCT_EXPORT_METHOD(enableEMRTD) {
     _netverifyConfiguration.delegate = self;
     _netverifyConfiguration.apiToken = apiToken;
     _netverifyConfiguration.apiSecret = apiSecret;
+    
+    JumioDataCenter jumioDataCenter = JumioDataCenterUS;
     NSString *dataCenterLowercase = [dataCenter lowercaseString];
-    _netverifyConfiguration.dataCenter = ([dataCenterLowercase isEqualToString: @"eu"]) ? JumioDataCenterEU : JumioDataCenterUS;
+    
+    if ([dataCenterLowercase isEqualToString: @"eu"]) {
+      jumioDataCenter = JumioDataCenterEU;
+    } else if ([dataCenterLowercase isEqualToString: @"sg"]) {
+      jumioDataCenter = JumioDataCenterSG;
+    }
+  
+    _netverifyConfiguration.dataCenter = jumioDataCenter;
     
     // Configuration
     if (![options isEqual:[NSNull null]]) {
@@ -69,6 +77,17 @@ RCT_EXPORT_METHOD(enableEMRTD) {
                 _netverifyConfiguration.reportingCriteria = [options objectForKey: key];
             } else if ([key isEqualToString: @"customerInternalReference"]) {
                 _netverifyConfiguration.customerInternalReference = [options objectForKey: key];
+            } else if ([key isEqualToString: @"enableWatchlistScreening"]) {
+              NSString* watchlistScreeningValue = [[options objectForKey: key] lowercaseString];
+              if ([watchlistScreeningValue isEqualToString:@"enabled"]) {
+                _netverifyConfiguration.watchlistScreening = NetverifyWatchlistScreeningEnabled;
+              } else if ([watchlistScreeningValue isEqualToString:@"disabled"]) {
+                _netverifyConfiguration.watchlistScreening = NetverifyWatchlistScreeningDisabled;
+              } else {
+                _netverifyConfiguration.watchlistScreening = NetverifyWatchlistScreeningDefault;
+              }
+            } else if ([key isEqualToString: @"watchlistSearchProfile"]) {
+              _netverifyConfiguration.watchlistSearchProfile = [options objectForKey: key];
             } else if ([key isEqualToString: @"sendDebugInfoToJumio"]) {
                 _netverifyConfiguration.sendDebugInfoToJumio = [self getBoolValue: [options objectForKey: key]];
             } else if ([key isEqualToString: @"dataExtractionOnMobileOnly"]) {
@@ -110,6 +129,8 @@ RCT_EXPORT_METHOD(enableEMRTD) {
         for (NSString *key in customization) {
             if ([key isEqualToString: @"disableBlur"]) {
                 [[NetverifyBaseView jumioAppearance] setDisableBlur: @YES];
+            } else if ([key isEqualToString: @"enableDarkMode"]) {
+                [[NetverifyBaseView jumioAppearance] setEnableDarkMode:@YES];
             } else {
                 UIColor *color = [self colorWithHexString: [customization objectForKey: key]];
                 
@@ -127,7 +148,7 @@ RCT_EXPORT_METHOD(enableEMRTD) {
                   	[[NetverifyDocumentSelectionHeaderView jumioAppearance] setBackgroundColor: color];
                	} else if ([key isEqualToString: @"documentSelectionHeaderTitleColor"]) {
                    	[[NetverifyDocumentSelectionHeaderView jumioAppearance] setTitleColor: color];
-            	} else if ([key isEqualToString: @"documentSelectionHeaderIconColor"]) {
+                } else if ([key isEqualToString: @"documentSelectionHeaderIconColor"]) {
                     [[NetverifyDocumentSelectionHeaderView jumioAppearance] setIconColor: color];
                 } else if ([key isEqualToString: @"documentSelectionButtonBackgroundColor"]) {
                     [[NetverifyDocumentSelectionButton jumioAppearance] setBackgroundColor: color forState: UIControlStateNormal];
@@ -153,6 +174,14 @@ RCT_EXPORT_METHOD(enableEMRTD) {
                     [[NetverifyNegativeButton jumioAppearance] setBorderColor: color];
                 } else if ([key isEqualToString: @"negativeButtonTitleColor"]) {
                     [[NetverifyNegativeButton jumioAppearance] setTitleColor: color forState:UIControlStateNormal];
+                } else if ([key isEqualToString: @"faceOvalColor"]) {
+                    [[NetverifyScanOverlayView jumioAppearance] setFaceOvalColor: color];
+                } else if ([key isEqualToString: @"faceProgressColor"]) {
+                     [[NetverifyScanOverlayView jumioAppearance] setFaceProgressColor: color];
+                } else if ([key isEqualToString: @"faceFeedbackBackgroundColor"]) {
+                     [[NetverifyScanOverlayView jumioAppearance] setFaceFeedbackBackgroundColor: color];
+                } else if ([key isEqualToString: @"faceFeedbackTextColor"]) {
+                     [[NetverifyScanOverlayView jumioAppearance] setFaceFeedbackTextColor: color];
                 }
             }
         }
@@ -287,7 +316,7 @@ RCT_EXPORT_METHOD(startNetverify) {
 
 	AppDelegate *delegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
 	[delegate.window.rootViewController dismissViewControllerAnimated: YES completion: ^{
-    	[self sendEventWithName: @"EventError" body: result];
+    	[self sendEventWithName: @"EventErrorNetverify" body: result];
     
       if (self.netverifyViewController != nil) {
         [self.netverifyViewController destroy];

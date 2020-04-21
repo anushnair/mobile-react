@@ -35,7 +35,9 @@ const startNetverify = () => {
 	  //dataExtractionOnMobileOnly: false,
 	  //cameraPosition: "back",
 	  //preselectedDocumentVariant: "plastic",
-	  //documentTypes: ["PASSPORT", "DRIVER_LICENSE", "IDENTITY_CARD", "VISA"]
+	  //documentTypes: ["PASSPORT", "DRIVER_LICENSE", "IDENTITY_CARD", "VISA"],
+	  //enableWatchlistScreening: ["enabled", "disabled" || "default"],
+	  //watchlistSearchProfile: "YOURPROFILENAME"
   });
   
   // Android only
@@ -50,7 +52,8 @@ const startAuthentication = () => {
   JumioMobileSDKAuthentication.initAuthentication('API_TOKEN', 'API_SECRET', 'DATACENTER', {
 	  enrollmentTransactionReference: "EnrollmentTransactionReference",
 	  //userReference: "UserReference",
-	  //callbackUrl: "URL"
+	  //callbackUrl: "URL",
+	  //authenticationTransactionReference: "AuthenticationTransactionReference"
   });  
 };
 
@@ -66,8 +69,8 @@ const startDocumentVerification = () => {
 	  //callbackUrl: "URL",
 	  //documentName: "Name",
 	  //customDocumentCode: "Custom",
-    //cameraPosition: "back",
-    //enableExtraction: true
+      //cameraPosition: "back",
+      //enableExtraction: true
   });
   JumioMobileSDKDocumentVerification.startDocumentVerification();
 };
@@ -100,8 +103,8 @@ emitterNetverify.addListener(
 	(EventDocumentData) => console.warn("EventDocumentData: " + JSON.stringify(EventDocumentData))
 );
 emitterNetverify.addListener(
-    'EventError',
-    (EventError) => console.warn("EventError: " + JSON.stringify(EventError))
+    'EventErrorNetverify',
+    (EventErrorNetverify) => console.warn("EventErrorNetverify: " + JSON.stringify(EventErrorNetverify))
 );
 
 const emitterAuthentication = new NativeEventEmitter(JumioMobileSDKAuthentication);
@@ -110,8 +113,8 @@ emitterAuthentication.addListener(
 	(EventAuthentication) => console.warn("EventAuthentication: " + JSON.stringify(EventAuthentication))
 );
 emitterAuthentication.addListener(
-    'EventError',
-    (EventError) => console.warn("EventError: " + JSON.stringify(EventError))
+    'EventErrorAuthentication',
+    (EventErrorAuthentication) => console.warn("EventErrorAuthentication: " + JSON.stringify(EventErrorAuthentication))
 );
 emitterAuthentication.addListener(
     'EventInitiateSuccess',
@@ -124,8 +127,8 @@ emitterDocumentVerification.addListener(
     (EventDocumentVerification) => console.warn("EventDocumentVerification: " + JSON.stringify(EventDocumentVerification))
 );
 emitterDocumentVerification.addListener(
-    'EventError',
-    (EventError) => console.warn("EventError: " + JSON.stringify(EventError))
+    'EventErrorDocumentVerification',
+    (EventErrorDocumentVerification) => console.warn("EventErrorDocumentVerification: " + JSON.stringify(EventErrorDocumentVerification))
 );
 
 const emitterBamCheckout = new NativeEventEmitter(JumioMobileSDKBamCheckout)
@@ -134,8 +137,8 @@ emitterBamCheckout.addListener(
     (EventCardInformation) => console.warn("EventCardInformation: " + JSON.stringify(EventCardInformation))
 );
 emitterBamCheckout.addListener(
-    'EventError',
-    (EventError) => console.warn("EventError: " + JSON.stringify(EventError))
+    'EventErrorBam',
+    (EventErrorBam) => console.warn("EventErrorBam: " + JSON.stringify(EventErrorBam))
 );
 
 export default class DemoApp extends Component {
