@@ -17,7 +17,7 @@ android {
 }
 
 ext {
-    SDK_VERSION = "3.6.0"
+    SDK_VERSION = "3.5.0"
 }
 
 repositories {
