@@ -38,6 +38,8 @@ import java.util.ArrayList;
 
 public class JumioActivity extends NavigationActivity {
 
+	private static final String TAG = "JumioActivity";
+
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 		boolean allGranted = true;
@@ -104,8 +106,8 @@ public class JumioActivity extends NavigationActivity {
 
 				WritableArray writableArray = new WritableNativeArray();
 				ArrayList<String> scanReferenceList = data.getStringArrayListExtra(BamSDK.EXTRA_SCAN_ATTEMPTS);
-				if (scanReferenceList != null && scanReferenceList.size() > 0){
-					for (int i = scanReferenceList.size() - 1; i >= 0; i--){
+				if (scanReferenceList != null && scanReferenceList.size() > 0) {
+					for (int i = scanReferenceList.size() - 1; i >= 0; i--) {
 						writableArray.pushString(scanReferenceList.get(i));
 					}
 				}
@@ -119,20 +121,21 @@ public class JumioActivity extends NavigationActivity {
 
 				WritableArray writableArray = new WritableNativeArray();
 				ArrayList<String> scanReferenceList = data.getStringArrayListExtra(BamSDK.EXTRA_SCAN_ATTEMPTS);
-				if (scanReferenceList != null && scanReferenceList.size() > 0){
-					for (int i = scanReferenceList.size() - 1; i >= 0; i--){
+				if (scanReferenceList != null && scanReferenceList.size() > 0) {
+					for (int i = scanReferenceList.size() - 1; i >= 0; i--) {
 						writableArray.pushString(scanReferenceList.get(i));
 					}
 				}
 				sendErrorObjectWithArray(errorCode, errorMessage, writableArray);
 			}
-			if(JumioModuleBamCheckout.bamSDK != null){
+			if (JumioModuleBamCheckout.bamSDK != null) {
 				JumioModuleBamCheckout.bamSDK.destroy();
 			}
 		} else if (requestCode == NetverifySDK.REQUEST_CODE) {
 			if (data == null) {
 				return;
 			}
+
 			String scanReference = data.getStringExtra(NetverifySDK.EXTRA_SCAN_REFERENCE) != null ? data.getStringExtra(NetverifySDK.EXTRA_SCAN_REFERENCE) : "";
 
 			if (resultCode == Activity.RESULT_OK) {
@@ -226,7 +229,7 @@ public class JumioActivity extends NavigationActivity {
 				String errorCode = data.getStringExtra(NetverifySDK.EXTRA_ERROR_CODE);
 				sendErrorObject(errorCode, errorMessage, scanReference);
 			}
-			if(JumioModuleNetverify.netverifySDK != null){
+			if (JumioModuleNetverify.netverifySDK != null) {
 				JumioModuleNetverify.netverifySDK.destroy();
 			}
 		} else if (requestCode == DocumentVerificationSDK.REQUEST_CODE) {
@@ -247,7 +250,7 @@ public class JumioActivity extends NavigationActivity {
 				String errorCode = data.getStringExtra(DocumentVerificationSDK.EXTRA_ERROR_CODE);
 				sendErrorObject(errorCode, errorMessage, scanReference);
 			}
-			if(JumioModuleDocumentVerification.documentVerificationSDK != null){
+			if (JumioModuleDocumentVerification.documentVerificationSDK != null) {
 				JumioModuleDocumentVerification.documentVerificationSDK.destroy();
 			}
 		} else {
@@ -257,9 +260,13 @@ public class JumioActivity extends NavigationActivity {
 
 	// Helper methods
 
-	private void sendEvent(ReactContext reactContext, String eventName, WritableMap params) {
-		reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-			.emit(eventName, params);
+	private void sendEvent( ReactContext reactContext, String eventName, WritableMap params) {
+		if(null!=reactContext){
+			reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+					.emit(eventName, params);
+		}else{
+			Log.d(TAG, "sendEvent() called with: reactContext = [" + reactContext + "], eventName = [" + eventName + "], params = [" + params + "]");
+		}
 	}
 
 	public void startSdk(MobileSDK sdk) {
@@ -282,7 +289,7 @@ public class JumioActivity extends NavigationActivity {
 		WritableMap errorResult = Arguments.createMap();
 		errorResult.putString("errorCode", errorCode != null ? errorCode : "");
 		errorResult.putString("errorMessage", errorMsg != null ? errorMsg : "");
-		if (array != null){
+		if (array != null) {
 			errorResult.putArray("scanReferences", array);
 		} else {
 			errorResult.putString("scanReferences", "");
