@@ -132,6 +132,7 @@ public class JumioActivity extends ReactActivity {
 			}
 		} else if (requestCode == NetverifySDK.REQUEST_CODE) {
 			if (data == null) {
+				sendErrorObject("ERR0001", "Netverify SDK data returned is NULL", "");
 				return;
 			}
 			String scanReference = data.getStringExtra(NetverifySDK.EXTRA_SCAN_REFERENCE) != null ? data.getStringExtra(NetverifySDK.EXTRA_SCAN_REFERENCE) : "";
